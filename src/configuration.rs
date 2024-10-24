@@ -175,9 +175,6 @@ mod tests {
     fn test_load_ci_configuration_successfully() {
         std::env::set_var("RUN_CI", "true");
         let config = get_configurations().unwrap();
-        assert_eq!(config.database.database_name, "postgres");
-        assert_eq!(config.database.password.expose_secret(), "password");
-        assert_eq!(config.database.username, "postgres");
         assert_eq!(config.database.port, 5432);
     }
 

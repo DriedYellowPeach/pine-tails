@@ -1,6 +1,6 @@
 database:
   host: "127.0.0.1"
   port: 5432
-  username: "postgres"
+  username: "ci"
   password: "password"
-  database_name: "postgres"
+  database_name: "pine_tails_ci"
