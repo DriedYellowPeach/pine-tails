@@ -2,8 +2,12 @@ database:
   host: "127.0.0.1"
   port: 5433
   username: "neil"
-  # password: "password"
+  password: "password"
   database_name: "pine_tails_dev"
 gmail_service:
   token_api: "https://oauth2.googleapis.com/token"
   email_api: "https://gmail.googleapis.com/gmail/v1/users/me/messages/send"
+  sender_email: "emailexample@gmail.com"
+  client_id: "client_id_example"
+  client_secret: "client_secret_example"
+  refresh_token: "refresh_token_example"

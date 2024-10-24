@@ -78,19 +78,39 @@ pub fn get_configurations() -> Result<Settings, config::ConfigError> {
                 configuration_directory
                     .join("base")
                     .to_str()
-                    .expect("No such directory"),
+                    .expect("Path contains invalid unicode."),
+            )
+            .required(true),
+        );
+
+    let builder = builder.add_source(
+        config::File::with_name(
+            configuration_directory
+                .join("secret")
+                .to_str()
+                .expect("Path contains invalid unicode."),
+        )
+        .required(false),
+    );
+
+    // If it is in a CI, also load CI configurations
+    let is_ci = std::env::var("RUN_CI").map_or(false, |s| {
+        matches!(s.as_str(), "1" | "true" | "yes" | "TRUE" | "YES")
+    });
+
+    let builder = if is_ci {
+        builder.add_source(
+            config::File::with_name(
+                configuration_directory
+                    .join("ci-base")
+                    .to_str()
+                    .expect("Path contains invalid unicode."),
             )
             .required(true),
         )
-        .add_source(
-            config::File::with_name(
-                configuration_directory
-                    .join("secret")
-                    .to_str()
-                    .expect("No such directory"),
-            )
-            .required(false),
-        );
+    } else {
+        builder
+    };
 
     let environment: Environment = std::env::var("APP_ENV")
         .unwrap_or_else(|_| "local".into())
@@ -102,7 +122,7 @@ pub fn get_configurations() -> Result<Settings, config::ConfigError> {
             configuration_directory
                 .join(environment.as_str())
                 .to_str()
-                .expect("No such file"),
+                .expect("Path contains invalid unicode."),
         )
         .required(true),
     );
@@ -151,8 +171,27 @@ mod tests {
         assert!(config.is_ok());
     }
 
-    // #[test]
-    // fn test_load_configuration_successfully_without_secrete_yml() {
-    //
-    // }
+    #[test]
+    fn test_load_ci_configuration_successfully() {
+        std::env::set_var("RUN_CI", "true");
+        let config = get_configurations().unwrap();
+        assert_eq!(config.database.database_name, "postgres");
+        assert_eq!(config.database.password.expose_secret(), "password");
+        assert_eq!(config.database.username, "postgres");
+        assert_eq!(config.database.port, 5432);
+    }
+
+    #[test]
+    fn test_path_join() {
+        use std::path::{Path, PathBuf};
+        assert_eq!(
+            Path::new("/noexist")
+                .join("passwd")
+                .to_str()
+                .expect("path is not valid unicode"),
+            PathBuf::from("/noexist/passwd")
+                .to_str()
+                .expect("path is not valid unicode")
+        );
+    }
 }
