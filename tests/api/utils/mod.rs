@@ -20,11 +20,21 @@ static TRACING: Lazy<()> = Lazy::new(|| {
         matches!(x.as_str(), "1" | "true" | "yes" | "TRUE")
     });
 
+    let valid_levels = ["info", "error", "trace", "warn", "debug"];
+    let level = std::env::var("LOG_LEVEL").ok();
+    let log_level = level
+        .as_deref()
+        .filter(|lvl| valid_levels.contains(lvl))
+        .unwrap_or("error");
+
     let format = LoggerFormat::Pretty;
 
     if use_test_log {
-        let subscriber =
-            get_subscriber("debug".into(), format, LoggerOutbound::new(std::io::stderr));
+        let subscriber = get_subscriber(
+            log_level.into(),
+            format,
+            LoggerOutbound::new(std::io::stderr),
+        );
         init_subscriber(subscriber);
     } else {
         let subscriber = get_subscriber("debug".into(), format, LoggerOutbound::new(std::io::sink));
