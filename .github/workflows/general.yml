@@ -74,11 +74,11 @@ jobs:
           SKIP_DOCKER=true bash ./dev-tools/init_db.sh
 
       - name: Run tests
-        run: RUN_CI=true cargo test
+        run: RUSTFLAGS="-A dead_code" RUN_CI=true cargo test
 
         # TODO: figure out what this do?
       - name: Check that queries are fresh
-        run: | 
+        run: |
           DATABASE_URL="postgres://${APP_USER}:${APP_USER_PWD}@localhost:${DB_PORT}/${APP_DB_NAME}" cargo sqlx prepare --workspace --check -- --all-targets
 
   # `fmt` container job
@@ -148,7 +148,7 @@ jobs:
       - name: Install cargo-llvm-cov
         uses: taiki-e/install-action@cargo-llvm-cov
       - name: Generate code coverage
-        run: RUN_CI=true cargo llvm-cov --all-features --workspace --lcov --output-path lcov.info
+        run: RUSTFLAGS="-A dead_code" RUN_CI=true cargo llvm-cov --all-features --workspace --lcov --output-path lcov.info
       - name: Generate report
         run: cargo llvm-cov report --html --output-dir coverage
       - uses: actions/upload-artifact@v4

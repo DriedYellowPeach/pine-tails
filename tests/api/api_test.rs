@@ -1,3 +1,3 @@
 mod health_check;
-#[allow(dead_code)]
+mod posts;
 mod utils;
