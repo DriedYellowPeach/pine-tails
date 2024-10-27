@@ -4,7 +4,7 @@ use actix_web::{web, App, HttpServer};
 use tracing_actix_web::TracingLogger;
 
 use crate::configuration::Settings;
-use crate::routes::health_check;
+use crate::routes::*;
 
 use super::prepare::Kits;
 
@@ -24,6 +24,13 @@ impl Engine {
             App::new()
                 .wrap(TracingLogger::default())
                 .wrap(middleware::NormalizePath::new(TrailingSlash::Trim))
+                .service(
+                    web::scope("/posts")
+                        .route("", web::get().to(get_all_posts))
+                        .route("/slug/{slug}", web::get().to(get_post_by_slug))
+                        .route("/count", web::get().to(get_posts_count))
+                        .route("", web::post().to(upload_post)), // .route("/{id}", web::post().to(upload_post))
+                )
                 .route("/health_check", web::get().to(health_check))
                 .app_data(db_pool.clone())
                 .app_data(email_client.clone())

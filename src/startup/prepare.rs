@@ -46,6 +46,7 @@ pub fn prepare_db_pool(config: &Settings) -> PgPool {
         .database(&config.database.database_name);
 
     PgPoolOptions::new()
+        .max_connections(10)
         .acquire_timeout(std::time::Duration::from_secs(2))
         .connect_lazy_with(options)
 }
