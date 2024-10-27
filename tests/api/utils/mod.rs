@@ -5,7 +5,6 @@ use mail_parser::MessageParser;
 use once_cell::sync::Lazy;
 use reqwest::Url;
 use secrecy::ExposeSecret;
-use serde::Serialize;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use uuid::Uuid;
 use wiremock::MockServer;

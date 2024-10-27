@@ -1,7 +1,7 @@
 use actix_multipart::form::{tempfile::TempFile, MultipartForm};
 use actix_web::{web, HttpResponse, ResponseError};
 use anyhow::Context;
-use sqlx::{query, PgPool};
+use sqlx::PgPool;
 use tokio::io::AsyncReadExt;
 
 use std::collections::HashMap;
@@ -28,7 +28,7 @@ pub async fn get_post_by_slug(
     slug: web::Path<String>,
 ) -> Result<HttpResponse, PostsError> {
     let slug = slug.into_inner();
-    let post = query!(
+    let post = sqlx::query!(
         "SELECT id, slug, title, content, date FROM posts WHERE slug = $1",
         &slug,
     )
@@ -67,7 +67,7 @@ pub async fn get_all_posts(
         .unwrap_or(10);
     let offset = (page - 1) * per_page;
 
-    let posts = query!(
+    let posts = sqlx::query!(
         "SELECT id, slug, title, content, description, date FROM posts ORDER BY date DESC LIMIT $1 OFFSET $2",
         per_page,
         offset
