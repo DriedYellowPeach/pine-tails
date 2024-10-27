@@ -126,26 +126,6 @@ impl TestApp {
         connection_pool
     }
 
-    pub async fn post_subscription<T: Serialize + ?Sized>(&self, form: &T) -> reqwest::Response {
-        let api_addr = format!("{}/subscriptions", self.address);
-        self.client
-            .post(&api_addr)
-            .form(form)
-            .send()
-            .await
-            .expect("Failed to send request")
-    }
-
-    pub async fn post_newsletters<T: Serialize + ?Sized>(&self, body: &T) -> reqwest::Response {
-        let api_addr = format!("{}/newsletters", self.address);
-        self.client
-            .post(&api_addr)
-            .json(body)
-            .send()
-            .await
-            .expect("Failed to send request")
-    }
-
     pub async fn request_resend_email(&self, email: &str) -> reqwest::Response {
         let api_addr = format!("{}/subscriptions/resend_confirmation", self.address);
         let form = [("email", email)];

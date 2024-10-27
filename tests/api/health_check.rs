@@ -5,9 +5,8 @@ async fn health_check() {
     let app = TestApp::spawn_server().await;
     let api_addr = format!("{}/health_check", app.address);
 
-    let client = reqwest::Client::new();
-
-    let response = client
+    let response = app
+        .client
         .get(api_addr)
         .send()
         .await
@@ -22,9 +21,8 @@ async fn healthcheck_should_return_200_even_if_url_with_extra_trailing_slash() {
     let app = TestApp::spawn_server().await;
     let api_addr = format!("{}/health_check/", app.address);
 
-    let client = reqwest::Client::new();
-
-    let response = client
+    let response = app
+        .client
         .get(api_addr)
         .send()
         .await
