@@ -80,7 +80,7 @@ jobs:
       # TODO: figure out what this do?
       - name: Check that queries are fresh
         run: |
-          cargo sqlx prepare --workspace --check -- --all-targets
+          DATABASE_URL="postgres://${APP_USER}:${APP_USER_PWD}@localhost:${DB_PORT}/${APP_DB_NAME}" cargo sqlx prepare --workspace --check -- --all-targets
 
   # `fmt` container job
   fmt:
