@@ -102,6 +102,13 @@ impl PostBuilder {
     }
 }
 
+impl std::fmt::Display for Post {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let metadata = serde_yml::to_string(&self.metadata).unwrap_or_default();
+        write!(f, "---\n{}---\n{}", metadata, self.content)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use chrono::Datelike;
@@ -204,5 +211,30 @@ definitely_not_metadata
         let post = bd.build();
 
         assert_eq!(post.content, "content directly");
+    }
+
+    #[test]
+    fn post_display_gives_right_format() {
+        let post = Post {
+            id: Uuid::new_v4(),
+            metadata: PostMetadata {
+                title: "My first post".to_string(),
+                slug: "my-first-post".to_string(),
+                date: Utc::now(),
+            },
+            content: "Hello world".to_string(),
+        };
+
+        /*
+        ------
+        tile: "xxxx"
+        slug: "xxx"
+        date: "xxx"
+        ------
+        xxxx
+        */
+
+        let expected = post.to_string();
+        assert_eq!(expected.split('\n').count(), 6);
     }
 }

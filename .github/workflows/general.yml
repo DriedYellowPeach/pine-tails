@@ -77,11 +77,10 @@ jobs:
         run: |
           DATABASE_URL="postgres://${APP_USER}:${APP_USER_PWD}@localhost:${DB_PORT}/${APP_DB_NAME}" RUSTFLAGS="-A dead_code" RUN_CI=true cargo test
 
-        # TODO: figure out what this do?
-      # - name: Check that queries are fresh
-      #   run: |
-      #     DATABASE_URL="postgres://${APP_USER}:${APP_USER_PWD}@localhost:${DB_PORT}/${APP_DB_NAME}" RUSTFLAGS="-A dead_code" cargo sqlx prepare
-      #     DATABASE_URL="postgres://${APP_USER}:${APP_USER_PWD}@localhost:${DB_PORT}/${APP_DB_NAME}" RUSTFLAGS="-A dead_code" cargo sqlx prepare --workspace --check -- --all-targets
+      # TODO: figure out what this do?
+      - name: Check that queries are fresh
+        run: |
+          cargo sqlx prepare --workspace --check -- --all-targets
 
   # `fmt` container job
   fmt:

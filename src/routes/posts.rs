@@ -111,6 +111,7 @@ pub struct UploadForm {
     file: TempFile,
 }
 
+// TODO: What if post has same slug?
 #[tracing::instrument(name = "Upload post with file", skip(payload, pool))]
 pub async fn upload_post(
     MultipartForm(payload): MultipartForm<UploadForm>,
@@ -144,5 +145,6 @@ pub async fn upload_post(
     .context("Failed to insert post")
     .inspect_err(|e| tracing::error!("{e:?}"))?;
 
+    tracing::info!("Post <{}> uploaded successfully", post.id);
     Ok(HttpResponse::Created().finish())
 }

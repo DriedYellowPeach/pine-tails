@@ -1,3 +1,4 @@
+use actix_cors::Cors;
 use actix_web::dev::Server;
 use actix_web::middleware::{self, TrailingSlash};
 use actix_web::{web, App, HttpServer};
@@ -24,6 +25,13 @@ impl Engine {
             App::new()
                 .wrap(TracingLogger::default())
                 .wrap(middleware::NormalizePath::new(TrailingSlash::Trim))
+                .wrap(
+                    Cors::default()
+                        .allowed_origin("http://localhost:3000") // Replace with your frontend origin
+                        .allow_any_method()
+                        .allow_any_header()
+                        .max_age(3600),
+                )
                 .service(
                     web::scope("/posts")
                         .route("", web::get().to(get_all_posts))

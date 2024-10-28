@@ -15,10 +15,11 @@ name = "flip_pine"
 linkify = "0.10.0"
 mail-parser = "0.9.4"
 wiremock = "0.6"
-fake = "2.10"
+fake = { version = "2.10", features = ["chrono-tz", "chrono"] }
 reqwest = { version = "0.12.7", features = ["multipart", "stream"] }
 tokio-util = { version = "0.7", features = ["codec"] }
 futures = "0.3"
+tempfile = "3.13"
 
 [dependencies]
 # >>>>>>>>>>>>>>
@@ -68,6 +69,7 @@ lettre = "0.11"
 regex = "1.11"
 slug = "0.1.6"
 actix-multipart = "0.7.2"
+actix-cors = "0.7"
 
 # >>>>>>>>>>>>>>>>>>
 # 6. Error Handling \
@@ -93,3 +95,7 @@ features = [
 [[test]]
 name = "api_test"
 path = "tests/api/api_test.rs"
+
+[[test]]
+name = "fake_post"
+path = "tests/fake/fake_posts.rs"
