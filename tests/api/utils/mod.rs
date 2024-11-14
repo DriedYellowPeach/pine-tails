@@ -61,7 +61,7 @@ impl TestApp {
         let listener =
             std::net::TcpListener::bind("127.0.0.1:0").expect("Failed to create listener");
         let port = listener.local_addr().unwrap().port();
-        let address = format!("http://127.0.0.1:{}", port);
+        let address = format!("http://127.0.0.1:{}/api", port);
 
         let email_server = MockServer::start().await;
 

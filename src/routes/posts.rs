@@ -1,5 +1,5 @@
 use actix_multipart::form::{tempfile::TempFile, MultipartForm};
-use actix_web::{web, HttpResponse, ResponseError};
+use actix_web::{http, web, HttpResponse, ResponseError};
 use anyhow::Context;
 use sqlx::PgPool;
 use tokio::io::AsyncReadExt;
@@ -18,7 +18,10 @@ pub enum PostsError {
 
 impl ResponseError for PostsError {
     fn status_code(&self) -> actix_web::http::StatusCode {
-        actix_web::http::StatusCode::NOT_FOUND
+        match self {
+            Self::UnexpectedError(_) => http::StatusCode::INTERNAL_SERVER_ERROR,
+            Self::NotFoundError(_) => http::StatusCode::NOT_FOUND,
+        }
     }
 }
 
@@ -37,8 +40,9 @@ pub async fn get_post_by_slug(
     .context("Failed to fetch post")
     .inspect_err(|e| tracing::error!("{e:?}"))?;
 
-    let post = post
-        .ok_or_else(|| PostsError::NotFoundError(format!("Post with slug {} not found", &slug)))?;
+    let post = post.ok_or_else(|| {
+        PostsError::NotFoundError(format!("Post with slug `{}` not found", &slug))
+    })?;
 
     Ok(HttpResponse::Ok().json(serde_json::json!({
                 "id": post.id,

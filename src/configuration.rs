@@ -80,7 +80,7 @@ pub fn get_configurations() -> Result<Settings, config::ConfigError> {
                     .to_str()
                     .expect("Path contains invalid unicode."),
             )
-            .required(true),
+            .required(false),
         );
 
     let builder = builder.add_source(
@@ -106,7 +106,7 @@ pub fn get_configurations() -> Result<Settings, config::ConfigError> {
                     .to_str()
                     .expect("Path contains invalid unicode."),
             )
-            .required(true),
+            .required(false),
         )
     } else {
         builder
@@ -124,7 +124,7 @@ pub fn get_configurations() -> Result<Settings, config::ConfigError> {
                 .to_str()
                 .expect("Path contains invalid unicode."),
         )
-        .required(true),
+        .required(false),
     );
 
     let settings = builder.build().unwrap();

@@ -33,13 +33,16 @@ impl Engine {
                         .max_age(3600),
                 )
                 .service(
-                    web::scope("/posts")
-                        .route("", web::get().to(get_all_posts))
-                        .route("/slug/{slug}", web::get().to(get_post_by_slug))
-                        .route("/count", web::get().to(get_posts_count))
-                        .route("", web::post().to(upload_post)), // .route("/{id}", web::post().to(upload_post))
+                    web::scope("/api")
+                        .service(
+                            web::scope("/posts")
+                                .route("", web::get().to(get_all_posts))
+                                .route("/slug/{slug}", web::get().to(get_post_by_slug))
+                                .route("/count", web::get().to(get_posts_count))
+                                .route("", web::post().to(upload_post)), // .route("/{id}", web::post().to(upload_post))
+                        )
+                        .route("/health_check", web::get().to(health_check)),
                 )
-                .route("/health_check", web::get().to(health_check))
                 .app_data(db_pool.clone())
                 .app_data(email_client.clone())
                 .app_data(base_url.clone())
