@@ -6,20 +6,30 @@ use sqlx::{
 
 use std::net::TcpListener;
 
-use crate::{components::email_delivery::EmailClient, configuration::Settings};
+use crate::{
+    components::blob_storage::BlobStorage, components::email_delivery::EmailClient,
+    configuration::Settings,
+};
 
 pub struct Kits {
     pub listener: TcpListener,
     pub db_pool: PgPool,
     pub email_client: EmailClient,
+    pub blob_storage: BlobStorage,
 }
 
 impl Kits {
-    pub fn new(listener: TcpListener, db_pool: PgPool, email_client: EmailClient) -> Self {
+    pub fn new(
+        listener: TcpListener,
+        db_pool: PgPool,
+        email_client: EmailClient,
+        blob_storage: BlobStorage,
+    ) -> Self {
         Self {
             listener,
             db_pool,
             email_client,
+            blob_storage,
         }
     }
 
@@ -28,6 +38,7 @@ impl Kits {
             listener: prepare_listener(config)?,
             db_pool: prepare_db_pool(config),
             email_client: prepare_email_client(config),
+            blob_storage: prepare_blob_storage(config)?,
         })
     }
 }
@@ -53,4 +64,10 @@ pub fn prepare_db_pool(config: &Settings) -> PgPool {
 
 pub fn prepare_email_client(config: &Settings) -> EmailClient {
     EmailClient::from(&config.gmail_service)
+}
+
+pub fn prepare_blob_storage(config: &Settings) -> std::io::Result<BlobStorage> {
+    let bs = BlobStorage::new(config.blob_storage.base_dir.clone());
+    bs.try_init_blob_storage()?;
+    Ok(bs)
 }

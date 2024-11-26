@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id, slug, title, content, date FROM posts WHERE slug = $1",
+  "query": "SELECT id, slug, title, date, blob FROM posts WHERE slug = $1",
   "describe": {
     "columns": [
       {
@@ -20,13 +20,13 @@
       },
       {
         "ordinal": 3,
-        "name": "content",
-        "type_info": "Text"
+        "name": "date",
+        "type_info": "Timestamptz"
       },
       {
         "ordinal": 4,
-        "name": "date",
-        "type_info": "Timestamptz"
+        "name": "blob",
+        "type_info": "Text"
       }
     ],
     "parameters": {
@@ -38,9 +38,9 @@
       false,
       false,
       false,
-      true,
+      false,
       false
     ]
   },
-  "hash": "4465b6b5ba9b6b13e501dad2d1dc96354d61739ccbc637d45a63914aa58f2e54"
+  "hash": "7484765436efb23e94429c75713c2cdcb4923c54100174b2f82c63b6444270ab"
 }

@@ -11,7 +11,9 @@ use wiremock::MockServer;
 
 use pine_tails::configuration::{get_configurations, DatabaseSettings};
 use pine_tails::startup::engine::Engine as WebEngine;
-use pine_tails::startup::prepare::{prepare_db_pool, prepare_email_client, Kits};
+use pine_tails::startup::prepare::{
+    prepare_blob_storage, prepare_db_pool, prepare_email_client, Kits,
+};
 use pine_tails::telemetry::{get_subscriber, init_subscriber, LoggerFormat, LoggerOutbound};
 
 static TRACING: Lazy<()> = Lazy::new(|| {
@@ -71,10 +73,13 @@ impl TestApp {
 
         let configuration = {
             let mut temp_config = get_configurations().expect("Failed to read configuration");
-            temp_config.database.database_name = Uuid::new_v4().to_string();
+            let test_id = Uuid::new_v4();
+            temp_config.database.database_name = test_id.to_string();
             temp_config.gmail_service.email_api = format!("{}/{}", api_root, email_api);
             temp_config.gmail_service.token_api = format!("{}/{}", api_root, token_api);
             temp_config.application.base_url = address.clone();
+            temp_config.blob_storage.base_dir =
+                std::path::PathBuf::from("/tmp").join(test_id.to_string());
             temp_config
         };
 
@@ -94,6 +99,7 @@ impl TestApp {
             listener,
             prepare_db_pool(&configuration),
             prepare_email_client(&configuration),
+            prepare_blob_storage(&configuration).unwrap(),
         );
         let engine = WebEngine::build(configuration, kits).unwrap();
         tokio::spawn(engine.spinup());

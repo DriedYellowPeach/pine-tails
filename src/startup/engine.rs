@@ -19,6 +19,7 @@ impl Engine {
     pub fn build(config: Settings, kits: Kits) -> Result<Self, std::io::Error> {
         let db_pool = web::Data::new(kits.db_pool);
         let email_client = web::Data::new(kits.email_client);
+        let blob_storage = web::Data::new(kits.blob_storage);
         let base_url = web::Data::new(WebBaseUrl(config.application.base_url));
 
         let server = HttpServer::new(move || {
@@ -37,14 +38,21 @@ impl Engine {
                         .service(
                             web::scope("/posts")
                                 .route("", web::get().to(get_all_posts))
+                                .route("", web::post().to(upload_post))
+                                .route("/{id}", web::put().to(update_post))
+                                .route("/{id}", web::delete().to(delete_post))
                                 .route("/slug/{slug}", web::get().to(get_post_by_slug))
-                                .route("/count", web::get().to(get_posts_count))
-                                .route("", web::post().to(upload_post)), // .route("/{id}", web::post().to(upload_post))
+                                .route(
+                                    "/slug/{slug}/{attachment}",
+                                    web::get().to(get_post_attachment),
+                                )
+                                .route("/count", web::get().to(posts_count)),
                         )
                         .route("/health_check", web::get().to(health_check)),
                 )
                 .app_data(db_pool.clone())
                 .app_data(email_client.clone())
+                .app_data(blob_storage.clone())
                 .app_data(base_url.clone())
         })
         .listen(kits.listener)?

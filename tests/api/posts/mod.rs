@@ -10,13 +10,15 @@ use pine_tails::domain::posts::{Post, PostBuilder};
 use crate::utils::TestApp;
 
 async fn insert_post(pool: &PgPool, post: &Post) {
+    let id = uuid::Uuid::new_v4();
     sqlx::query!(
-        "INSERT INTO posts (id, slug, title, content, date) VALUES ($1, $2, $3, $4, $5)",
-        post.id,
+        "INSERT INTO posts (id, slug, title, content, date, blob) VALUES ($1, $2, $3, $4, $5, $6)",
+        id,
         post.metadata.slug,
         post.metadata.title,
         post.content,
-        post.metadata.date
+        post.metadata.date,
+        id.to_string(),
     )
     .execute(pool)
     .await

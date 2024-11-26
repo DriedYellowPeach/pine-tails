@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use secrecy::{ExposeSecret, SecretBox};
 
 use crate::domain::users::UserEmail;
@@ -8,6 +10,7 @@ pub struct Settings {
     pub database: DatabaseSettings,
     pub application: AppSettings,
     pub gmail_service: GmailApiSettings,
+    pub blob_storage: BlobStorageSettings,
 }
 
 #[derive(serde::Deserialize, Debug)]
@@ -25,6 +28,13 @@ pub struct AppSettings {
     pub host: String,
     pub logger_format: LoggerFormat,
     pub base_url: String,
+}
+
+#[derive(serde::Deserialize, Debug)]
+pub struct BlobStorageSettings {
+    pub base_dir: PathBuf,
+    #[serde(default)]
+    pub ephemeral: bool,
 }
 
 #[derive(serde::Deserialize, Debug)]

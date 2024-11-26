@@ -5,7 +5,6 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 pub struct Post {
-    pub id: Uuid,
     pub metadata: PostMetadata,
     pub content: String,
 }
@@ -95,7 +94,6 @@ impl PostBuilder {
             .unwrap_or_else(|| "hello".to_string());
 
         Post {
-            id,
             metadata: PostMetadata { title, slug, date },
             content,
         }
@@ -216,7 +214,6 @@ definitely_not_metadata
     #[test]
     fn post_display_gives_right_format() {
         let post = Post {
-            id: Uuid::new_v4(),
             metadata: PostMetadata {
                 title: "My first post".to_string(),
                 slug: "my-first-post".to_string(),

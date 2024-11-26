@@ -11,3 +11,5 @@ gmail_service:
   client_id: "client_id_example"
   client_secret: "client_secret_example"
   refresh_token: "refresh_token_example"
+blob_storage:
+  base_dir: "./blob_storage"

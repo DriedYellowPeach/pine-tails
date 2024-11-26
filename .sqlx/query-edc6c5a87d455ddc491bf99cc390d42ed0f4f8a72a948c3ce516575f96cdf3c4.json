@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE posts \n            SET title = $1, slug = $2, blob = $3\n            WHERE id = $4\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Text",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "edc6c5a87d455ddc491bf99cc390d42ed0f4f8a72a948c3ce516575f96cdf3c4"
+}

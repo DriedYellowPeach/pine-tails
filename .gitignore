@@ -2,3 +2,5 @@
 secret.yaml
 tarpaulin-report.html
 ops/*
+tmp/*
+blob_storage/*
