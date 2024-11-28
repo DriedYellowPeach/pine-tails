@@ -48,8 +48,8 @@ impl LocalStorageDriver {
         attachment: TempFile,
     ) -> std::io::Result<()> {
         self.saved = true;
-        let path = self.blob_path.join(file_name);
-        attachment.file.persist(path)?;
+        let save_path = self.blob_path.join(file_name);
+        fs::copy(attachment.file.path(), save_path)?;
         Ok(())
     }
 
