@@ -1,4 +1,3 @@
-
 # STAGE ONE: COMPILE-TIME
 # From base image and give it a tag
 FROM rust:1.81.0 AS builder
@@ -12,7 +11,7 @@ RUN apt update && apt install lld clang -y
 # Copy source code
 COPY . .
 # Setup environment variables
-ENV SQLX_OFFLINE true
+ENV SQLX_OFFLINE=true
 # Use build tools to build target
 RUN cargo build --release
 
@@ -33,7 +32,7 @@ RUN apt-get update -y \
 # Copy configurations
 COPY configurations configurations
 # Set runtime environment variables
-ENV APP_ENV production
+ENV APP_ENV=production
 
 # Set which command to run when start the container
 ENTRYPOINT ["./flip_pine"]

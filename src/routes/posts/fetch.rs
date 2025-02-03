@@ -1,7 +1,9 @@
 use actix_files::NamedFile;
 use actix_web::{web, HttpResponse};
 use anyhow::Context;
+use chrono::{DateTime, Utc};
 use sqlx::PgPool;
+use uuid::Uuid;
 
 use std::collections::HashMap;
 
@@ -28,23 +30,39 @@ pub async fn get_all_posts(
         .unwrap_or(10);
     let offset = (page - 1) * per_page;
 
-    let posts = sqlx::query!(
-        "SELECT id, slug, title, content, description, date FROM posts ORDER BY date DESC LIMIT $1 OFFSET $2",
-        per_page,
-        offset
-    )
-    .fetch_all(pool.get_ref())
-    .await.context("Failed to fetch posts in page").inspect_err(|e| tracing::error!("{e:?}"))?;
+    tracing::info!(target: "Fetching posts", page, per_page);
+
+    let mut builder = sqlx::QueryBuilder::<sqlx::Postgres>::new(
+        "SELECT id, slug, title, date FROM posts ORDER BY date DESC",
+    );
+
+    // if page < 0 or per_page <= 0, return all
+    if page > 0 && per_page > 0 {
+        builder
+            .push(" LIMIT ")
+            .push_bind(per_page)
+            .push(" OFFSET ")
+            .push_bind(offset);
+    }
+
+    type PostRecord = (Uuid, String, String, DateTime<Utc>);
+
+    let posts = builder
+        .build_query_as::<PostRecord>()
+        .fetch_all(pool.get_ref())
+        .await
+        .context("Failed to fetch posts in page")
+        .inspect_err(|e| tracing::error!("{e:?}"))?;
 
     let result: Vec<serde_json::Value> = posts
         .into_iter()
         .map(|post| {
             serde_json::json!(
                 {
-                    "id": post.id,
-                    "slug": post.slug,
-                    "title": post.title,
-                    "date": post.date,
+                    "id": post.0,
+                    "slug": post.1,
+                    "title": post.2,
+                    "date": post.3,
                 }
             )
         })

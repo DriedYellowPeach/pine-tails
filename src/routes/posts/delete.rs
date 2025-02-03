@@ -1,7 +1,3 @@
-// Two thing to delete
-// The record
-// The post files
-
 use actix_web::{web, HttpResponse};
 use anyhow::Context;
 use sqlx::PgPool;

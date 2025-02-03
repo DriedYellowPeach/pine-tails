@@ -24,6 +24,7 @@ pub async fn update_post(
 ) -> Result<HttpResponse, PostsError> {
     let post_id = post_id.into_inner();
     let files = payload.files;
+    tracing::info!(target: "Updating post", ?post_id, ?files);
 
     // Fetch the existing post from the database
     let existing_post = sqlx::query!(
