@@ -14,6 +14,8 @@ pub async fn delete_post(
     blob_storage: web::Data<BlobStorage>,
 ) -> Result<HttpResponse, PostsError> {
     let post_id = post_id.into_inner();
+    tracing::info!(target: "Deleting post", ?post_id);
+
     let to_delete_post = sqlx::query!(
         r#"
         DELETE FROM posts
@@ -28,9 +30,8 @@ pub async fn delete_post(
         "Failed to execute delete query on post with id: {}",
         post_id
     ))
-    .inspect_err(|e| tracing::error!("{e:?}"))?;
-
-    let to_delete_post = to_delete_post.ok_or_else(|| {
+    .inspect_err(|e| tracing::error!("{e:?}"))?
+    .ok_or_else(|| {
         PostsError::NotFoundError(format!(
             "Failed to delete because Post with id {} is not found",
             post_id

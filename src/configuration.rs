@@ -104,9 +104,8 @@ pub fn get_configurations() -> Result<Settings, config::ConfigError> {
     );
 
     // If it is in a CI, also load CI configurations
-    let is_ci = std::env::var("RUN_CI").map_or(false, |s| {
-        matches!(s.as_str(), "1" | "true" | "yes" | "TRUE" | "YES")
-    });
+    let is_ci = std::env::var("RUN_CI")
+        .is_ok_and(|s| matches!(s.as_str(), "1" | "true" | "yes" | "TRUE" | "YES"));
 
     let builder = if is_ci {
         builder.add_source(

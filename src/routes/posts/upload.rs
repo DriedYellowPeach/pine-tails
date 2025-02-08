@@ -23,6 +23,9 @@ pub async fn upload_post(
     blob_storage: web::Data<BlobStorage>,
 ) -> Result<HttpResponse, PostsError> {
     let files = payload.files;
+
+    tracing::info!(target: "Uploading a post", ?files);
+
     let post = split_post_content_from_files(&files).await?;
     let id = Uuid::new_v4();
     let blob = id.to_string();

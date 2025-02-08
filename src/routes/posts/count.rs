@@ -6,6 +6,7 @@ use super::PostsError;
 
 #[tracing::instrument(name = "Get posts count", skip(pool))]
 pub async fn posts_count(pool: web::Data<PgPool>) -> Result<HttpResponse, PostsError> {
+    tracing::info!("Getting posts count");
     // Query to count all posts
     let record = sqlx::query!("SELECT COUNT(*) as count FROM posts")
         .fetch_one(pool.get_ref())
