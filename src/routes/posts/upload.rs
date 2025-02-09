@@ -68,7 +68,7 @@ pub async fn upload_post(
         .context("Failed to commit transaction")
         .inspect_err(|e| tracing::error!("{e:?}"))?;
 
-    Ok(HttpResponse::Ok().json(serde_json::json!(
+    Ok(HttpResponse::Created().json(serde_json::json!(
     {
         "slug": uniq_slug,
         "id": id

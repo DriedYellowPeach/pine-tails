@@ -9,7 +9,7 @@ use pine_tails::domain::posts::{Post, PostBuilder};
 
 use crate::utils::TestApp;
 
-async fn insert_post(pool: &PgPool, post: &Post) {
+async fn insert_post(pool: &PgPool, post: &Post) -> uuid::Uuid {
     let id = uuid::Uuid::new_v4();
     sqlx::query!(
         "INSERT INTO posts (id, slug, title, content, date, blob) VALUES ($1, $2, $3, $4, $5, $6)",
@@ -23,6 +23,8 @@ async fn insert_post(pool: &PgPool, post: &Post) {
     .execute(pool)
     .await
     .unwrap();
+
+    id
 }
 
 #[tokio::test]
@@ -32,8 +34,16 @@ async fn get_post_with_existing_slug_should_return_ok() {
         .with_title("hello there")
         .with_content("some content");
     let api_addr = format!("{}/posts/slug/hello-there", app.address);
+    let post = pb.build();
 
-    insert_post(&app.db_pool, &pb.build()).await;
+    let id = insert_post(&app.db_pool, &post).await;
+
+    let mut local_driver = app.blob_storage.post_storage_driver(&id.to_string());
+    local_driver.try_init().unwrap();
+    local_driver
+        .post_save_content("hello-there.md", &post.content)
+        .unwrap();
+    local_driver.confirm_saved();
 
     let response = app
         .client

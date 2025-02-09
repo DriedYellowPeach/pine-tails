@@ -3,6 +3,7 @@ pub mod email_service_mocking;
 use base64::prelude::*;
 use mail_parser::MessageParser;
 use once_cell::sync::Lazy;
+use pine_tails::components::blob_storage::BlobStorage;
 use reqwest::Url;
 use secrecy::ExposeSecret;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
@@ -17,25 +18,14 @@ use pine_tails::startup::prepare::{
 use pine_tails::telemetry::{get_subscriber, init_subscriber, LoggerFormat, LoggerOutbound};
 
 static TRACING: Lazy<()> = Lazy::new(|| {
-    let use_test_log = std::env::var("TEST_LOG").map_or(false, |x| {
-        matches!(x.as_str(), "1" | "true" | "yes" | "TRUE")
-    });
-
-    let valid_levels = ["info", "error", "trace", "warn", "debug"];
-    let level = std::env::var("LOG_LEVEL").ok();
-    let log_level = level
-        .as_deref()
-        .filter(|lvl| valid_levels.contains(lvl))
-        .unwrap_or("error");
+    let use_test_log = std::env::var("TEST_LOG")
+        .is_ok_and(|x| matches!(x.as_str(), "1" | "true" | "yes" | "TRUE"));
 
     let format = LoggerFormat::Pretty;
 
     if use_test_log {
-        let subscriber = get_subscriber(
-            log_level.into(),
-            format,
-            LoggerOutbound::new(std::io::stderr),
-        );
+        let subscriber =
+            get_subscriber("error".into(), format, LoggerOutbound::new(std::io::stderr));
         init_subscriber(subscriber);
     } else {
         let subscriber = get_subscriber("debug".into(), format, LoggerOutbound::new(std::io::sink));
@@ -45,11 +35,15 @@ static TRACING: Lazy<()> = Lazy::new(|| {
 
 pub struct TestApp {
     pub address: String,
-    pub db_pool: PgPool,
-    pub email_server: MockServer,
     pub email_api: String,
     pub refresh_api: String,
     pub client: reqwest::Client,
+    // NOTE: there are two connections to database
+    // one is this db_pool, acting as backdoor of our TEST
+    // the other is created when starting the web server
+    pub db_pool: PgPool,
+    pub email_server: MockServer,
+    pub blob_storage: BlobStorage,
 }
 
 pub struct ConfirmationLinks {
@@ -83,6 +77,10 @@ impl TestApp {
             temp_config
         };
 
+        let span = tracing::info_span!("Spawn test server");
+        let _enter = span.enter();
+        tracing::info!("Spawning server with configuration: {configuration:#?}");
+
         let db_pool = Self::pool_to_uniq_database(&configuration.database).await;
         let test_app = TestApp {
             address,
@@ -93,6 +91,7 @@ impl TestApp {
             email_api,
             refresh_api: token_api,
             client: reqwest::Client::new(),
+            blob_storage: prepare_blob_storage(&configuration).unwrap(),
         };
 
         let kits = Kits::new(

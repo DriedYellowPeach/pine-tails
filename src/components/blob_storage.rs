@@ -9,7 +9,7 @@ const COMMENTS_DIR: &str = "comments";
 
 pub struct LocalStorageDriver {
     blob_path: PathBuf,
-    saved: bool,
+    try_saving: bool,
     confirm: bool,
 }
 
@@ -17,7 +17,7 @@ impl LocalStorageDriver {
     pub fn new(blob_path: PathBuf) -> Self {
         Self {
             blob_path,
-            saved: false,
+            try_saving: false,
             confirm: false,
         }
     }
@@ -30,12 +30,12 @@ impl LocalStorageDriver {
         Ok(())
     }
 
-    pub fn confirm(&mut self) {
+    pub fn confirm_saved(&mut self) {
         self.confirm = true;
     }
 
     pub fn post_save_content(&mut self, file_name: &str, content: &str) -> std::io::Result<()> {
-        self.saved = true;
+        self.try_saving = true;
         let path = self.blob_path.join(file_name);
         let mut file = std::fs::File::create(path)?;
         file.write_all(content.as_bytes())?;
@@ -47,7 +47,7 @@ impl LocalStorageDriver {
         file_name: &str,
         attachment: TempFile,
     ) -> std::io::Result<()> {
-        self.saved = true;
+        self.try_saving = true;
         let save_path = self.blob_path.join(file_name);
         fs::copy(attachment.file.path(), save_path)?;
         Ok(())
@@ -61,7 +61,7 @@ impl LocalStorageDriver {
 // TODO: TEST drop log ok
 impl Drop for LocalStorageDriver {
     fn drop(&mut self) {
-        if self.saved && !self.confirm {
+        if self.try_saving && !self.confirm {
             if let Err(e) = fs::remove_dir_all(&self.blob_path) {
                 tracing::error!("Failed to clean up directory {:?}: {:?}", self.blob_path, e);
             }

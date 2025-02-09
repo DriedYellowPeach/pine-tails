@@ -58,9 +58,9 @@ async fn read_file_to_string(path: &Path) -> Result<String, PostsError> {
 async fn locate_post_content_file(blob: &str, blob_storage: &BlobStorage) -> Option<PathBuf> {
     let post_dir = blob_storage.single_post_dir(blob);
 
-    let mut entries = tokio::fs::read_dir(post_dir)
+    let mut entries = tokio::fs::read_dir(post_dir.clone())
         .await
-        .context("Failed to read post directory")
+        .context(format!("Failed to read post directory: {post_dir:?}"))
         .inspect_err(|e| tracing::error!("{e:?}"))
         .ok()?;
 
@@ -118,7 +118,7 @@ fn persist_post_and_attachments(
         }
     }
 
-    local_driver.confirm();
+    local_driver.confirm_saved();
 
     Ok(())
 }
