@@ -1,4 +1,5 @@
 use actix_cors::Cors;
+use actix_multipart::form::MultipartFormConfig;
 use actix_web::dev::Server;
 use actix_web::middleware::{self, TrailingSlash};
 use actix_web::{web, App, HttpServer};
@@ -24,6 +25,7 @@ impl Engine {
 
         let server = HttpServer::new(move || {
             App::new()
+                .app_data(web::PayloadConfig::new(1024 * 1024 * 1024))
                 .wrap(TracingLogger::default())
                 .wrap(middleware::NormalizePath::new(TrailingSlash::Trim))
                 .wrap(
@@ -50,6 +52,7 @@ impl Engine {
                         )
                         .route("/health_check", web::get().to(health_check)),
                 )
+                .app_data(MultipartFormConfig::default().total_limit(100 * 1024 * 1024))
                 .app_data(db_pool.clone())
                 .app_data(email_client.clone())
                 .app_data(blob_storage.clone())

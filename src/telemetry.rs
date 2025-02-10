@@ -101,7 +101,7 @@ where
 /// - `format` can be: "info", "debug", "trace", "warn", "error".
 /// - `logger_outbound` is where the log will be written to.
 pub fn get_subscriber<Sink>(
-    env_filter: String,
+    default_env_filter: String,
     format: LoggerFormat,
     output: LoggerOutbound<Sink>,
 ) -> Box<dyn Subscriber + Send + Sync>
@@ -109,7 +109,7 @@ where
     Sink: for<'a> MakeWriter<'a> + Send + Sync + 'static,
 {
     let env_filter =
-        EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(env_filter));
+        EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(default_env_filter));
 
     let filter_layer = Registry::default().with(env_filter);
 
