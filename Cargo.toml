@@ -1,6 +1,6 @@
 [package]
 name = "pine-tails"
-version = "0.1.7"
+version = "0.1.8"
 edition = "2021"
 
 [lib]
@@ -13,9 +13,9 @@ name = "flip_pine"
 
 [dev-dependencies]
 linkify = "0.10.0"
-mail-parser = "0.9.4"
+mail-parser = "0.10"
 wiremock = "0.6"
-fake = { version = "2.10", features = ["chrono-tz", "chrono"] }
+fake = { version = "3.1", features = ["chrono-tz", "chrono"] }
 reqwest = { version = "0.12.7", features = ["multipart", "stream"] }
 tokio-util = { version = "0.7", features = ["codec"] }
 futures = "0.3"
@@ -41,7 +41,7 @@ serde_yml = "0.0.12"
 # >>>>>>>>>>>>>>>>>>>>>>>>>
 # 3. Configuration Loading \
 # <<<<<<<<<<<<<<<<<<<<<<<<<<<
-config = "0.14"
+config = "0.15"
 
 # >>>>>>>>>>>
 # 4. Logging \
@@ -76,7 +76,7 @@ actix-cors = "0.7"
 # 6. Error Handling \
 # <<<<<<<<<<<<<<<<<<<<
 anyhow = "1.0.89"
-thiserror = "1.0.64"
+thiserror = "2.0"
 
 # >>>>>>>>>>>>
 # 7. Database \
