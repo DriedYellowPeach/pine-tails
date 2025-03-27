@@ -149,7 +149,7 @@ async fn generate_uniq_slug(pool: &PgPool, base_slug: &str) -> Result<String, sq
         })
         .max()
         .map(|n| format!("{}-{}", base_slug, n + 1))
-        .unwrap_or_else(|| format!("{}-1", base_slug));
+        .unwrap_or_else(|| format!("{base_slug}-1"));
 
     Ok(new_slug)
 }

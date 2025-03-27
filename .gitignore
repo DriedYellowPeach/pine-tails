@@ -1,6 +1,6 @@
 /target
 secret.yaml
 tarpaulin-report.html
-ops/*
+ops
 tmp/*
-blob_storage/*
+blob_storage
