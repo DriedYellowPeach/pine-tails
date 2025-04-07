@@ -1,6 +1,6 @@
 # STAGE ONE: COMPILE-TIME
 # From base image and give it a tag
-FROM rust:1.81.0 AS builder
+FROM rust:1.86.0 AS builder
 
 # Set working directory, or it's set to default /root
 WORKDIR /app 

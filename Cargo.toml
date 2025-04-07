@@ -11,6 +11,7 @@ name = "pine_tails"
 path = "src/main.rs"
 name = "flip_pine"
 
+
 [dev-dependencies]
 linkify = "0.10.0"
 mail-parser = "0.10"
@@ -78,10 +79,11 @@ actix-cors = "0.7"
 anyhow = "1.0.89"
 thiserror = "2.0"
 
-# nn_rs = { path = "../../nn-rs/", git = "https://github.com/DriedYellowPeach/nn-rs", version = "0.1.0" } # >>>>>>>>>>>>
-nn_rs = { git = "https://github.com/DriedYellowPeach/nn-rs", version = "0.1.0" } # >>>>>>>>>>>>
+# >>>>>>>>>>>>
 # 7. ML       \
 # <<<<<<<<<<<<<<
+nn_rs = { git = "https://github.com/DriedYellowPeach/nn-rs", version = "0.1.1" }
+# nn_rs = { path = "../../nn-rs/", version = "0.1.0" }
 image = "0.25.6"
 
 
