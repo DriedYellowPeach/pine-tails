@@ -4,3 +4,4 @@ application:
   logger_format: "pretty"
   # should be url, but we have not setup DNS test server
   base_url: "http://127.0.0.1:8000"
+  model_path: "model/model_9394.bin"

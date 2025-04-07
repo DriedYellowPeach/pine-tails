@@ -3,3 +3,4 @@ application:
   port: 8000
   logger_format: "pretty"
   base_url: "http://driedyellowpeach.us"
+  model_path: "model/model_9394.bin"

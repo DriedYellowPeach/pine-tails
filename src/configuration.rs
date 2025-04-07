@@ -28,6 +28,7 @@ pub struct AppSettings {
     pub host: String,
     pub logger_format: LoggerFormat,
     pub base_url: String,
+    pub model_path: String,
 }
 
 #[derive(serde::Deserialize, Debug)]

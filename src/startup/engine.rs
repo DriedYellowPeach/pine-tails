@@ -3,7 +3,10 @@ use actix_multipart::form::MultipartFormConfig;
 use actix_web::dev::Server;
 use actix_web::middleware::{self, TrailingSlash};
 use actix_web::{web, App, HttpServer};
+use anyhow::Result;
 use tracing_actix_web::TracingLogger;
+
+use nn_rs::prelude::*;
 
 use crate::configuration::Settings;
 use crate::routes::*;
@@ -17,11 +20,13 @@ pub struct Engine {
 pub struct WebBaseUrl(pub String);
 
 impl Engine {
-    pub fn build(config: Settings, kits: Kits) -> Result<Self, std::io::Error> {
+    pub fn build(config: Settings, kits: Kits) -> Result<Self> {
         let db_pool = web::Data::new(kits.db_pool);
         let email_client = web::Data::new(kits.email_client);
         let blob_storage = web::Data::new(kits.blob_storage);
         let base_url = web::Data::new(WebBaseUrl(config.application.base_url));
+        let nn = NNBuilder::new_from_model_file(config.application.model_path)?.build()?;
+        let nn = web::Data::new(nn);
 
         let server = HttpServer::new(move || {
             App::new()
@@ -50,6 +55,10 @@ impl Engine {
                                 )
                                 .route("/count", web::get().to(posts_count)),
                         )
+                        .service(
+                            web::scope("/playground")
+                                .route("digit_recognition", web::post().to(recognize_digit)),
+                        )
                         .route("/health_check", web::get().to(health_check)),
                 )
                 .app_data(MultipartFormConfig::default().total_limit(100 * 1024 * 1024))
@@ -57,6 +66,7 @@ impl Engine {
                 .app_data(email_client.clone())
                 .app_data(blob_storage.clone())
                 .app_data(base_url.clone())
+                .app_data(nn.clone())
         })
         .listen(kits.listener)?
         .run();
