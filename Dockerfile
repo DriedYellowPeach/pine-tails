@@ -6,7 +6,8 @@ FROM rust:1.86.0 AS builder
 WORKDIR /app 
 
 # install a compiler and a linker
-RUN apt update && apt install lld clang -y
+RUN apt update && apt install lld clang -y && apt-get install -y libopenblas-dev
+
 
 # Copy source code
 COPY . .
@@ -25,6 +26,7 @@ COPY --from=builder /app/target/release/flip_pine flip_pine
 # INSTALL RUNTIME DEPENDENCIES
 RUN apt-get update -y \
   && apt-get install -y  openssl ca-certificates \
+  && apt-get install -y libopenblas-dev \
   # Clean up
   && apt-get autoremove -y \
   && apt-get clean -y \

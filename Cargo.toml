@@ -82,7 +82,7 @@ thiserror = "2.0"
 # >>>>>>>>>>>>
 # 7. ML       \
 # <<<<<<<<<<<<<<
-nn_rs = { git = "https://github.com/DriedYellowPeach/nn-rs", version = "0.1.1" }
+nn_rs = { git = "https://github.com/DriedYellowPeach/nn-rs", version = "0.1.2" }
 # nn_rs = { path = "../../nn-rs/", version = "0.1.0" }
 image = "0.25.6"
 
