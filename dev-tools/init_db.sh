@@ -3,7 +3,7 @@ set -x
 set -eo pipefail
 
 # In pgadmin4, DB_NAME is the Name filed in general section
-# Check if a custom database name has been set, otherwise default to 'newsletter'
+# Check if a custom database name has been set, otherwise default to 'pine_tails_dev'
 DB_PORT="${DB_PORT:=5433}"
 SUPERUSER="${SUPERUSER:=postgres}"
 SUPERUSER_PWD="${SUPERUSER_PWD:=password}"
@@ -13,13 +13,13 @@ APP_DB_NAME="${APP_DB_NAME:=pine_tails_dev}"
 
 CONTAINER_NAME="postgres_$(date '+%s')"
 
-print_error() {
+function print_error() {
 	local RED='\033[0;31m'
 	local NC='\033[0m'
 	echo -e "${RED}Error: $1${NC}"
 }
 
-pre_flight_inspection() {
+function pre_flight_inspection() {
 	if [[ -z "$(command -v docker)" ]]; then
 		print_error 'docker is not installed' >&2
 		exit 1
@@ -42,7 +42,7 @@ to install it"
 
 }
 
-run_docker() {
+function run_docker() {
 	# Launch postgres using Docker
 	docker run \
 		--env POSTGRES_USER="${SUPERUSER}" \
@@ -58,7 +58,7 @@ run_docker() {
 	#>--------------^ Increased maximum number of connections for testing purposes
 }
 
-wait_for_db_ready() {
+function wait_for_db_ready() {
 	export PGPASSWORD="${APP_USER_PWD}"
 
 	until [ \
@@ -80,13 +80,13 @@ wait_for_db_ready() {
 	>&2 echo "Postgres is up and running on port ${DB_PORT} - running migrations now!"
 }
 
-db_migration() {
+function db_migration() {
 	export DATABASE_URL="postgres://${APP_USER}:${APP_USER_PWD}@localhost:${DB_PORT}/${APP_DB_NAME}"
 	sqlx database create
 	sqlx migrate run
 }
 
-main() {
+function main() {
 	pre_flight_inspection
 
 	if [[ -n "${SKIP_DOCKER}" ]]; then

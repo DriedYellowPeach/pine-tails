@@ -96,7 +96,6 @@ jobs:
           components: rustfmt
       - name: Enforce formatting
         run: cargo fmt --check
-
   clippy:
     name: Clippy
     runs-on: ubuntu-latest
@@ -110,7 +109,6 @@ jobs:
           components: clippy
       - name: Linting
         run: cargo clippy -- -D warnings
-
   coverage:
     name: Code coverage
     runs-on: ubuntu-latest

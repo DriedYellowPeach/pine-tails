@@ -56,7 +56,9 @@ impl PostBuilder {
             })
     }
 
-    /// try parse metadata from a raw string
+    // FIX: this unwrap_or_else is not a good idea actually,
+    // cause as user they may be confused that their metadata not in effective,
+    // should point out this to them
     pub fn from_raw_post(raw: &str) -> Self {
         // when try_from_post failed, we treat raw all as content
         Self::try_from_raw_post(raw).unwrap_or_else(|_| Self::default().with_content(raw))
